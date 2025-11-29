@@ -1,6 +1,7 @@
 import type { Client, Category, Policy } from '@/lib/definitions';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Use Next.js API routes (empty string means same origin)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 function getAuthToken(): string | null {
   if (typeof document === 'undefined') return null;

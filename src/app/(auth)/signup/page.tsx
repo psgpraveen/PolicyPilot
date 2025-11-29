@@ -29,7 +29,8 @@ import { SignUpSchema } from "@/lib/schemas";
 import { ShieldCheck } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+// Use Next.js API routes (empty string means same origin)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export default function SignUpPage() {
   const router = useRouter();
