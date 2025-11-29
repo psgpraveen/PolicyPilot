@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Info,
+  User,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -38,6 +39,37 @@ const navItems = [
 export function Navigation() {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(
+    null
+  );
+
+  useEffect(() => {
+    // Get user info from cookie
+    const getUserInfo = () => {
+      const userInfoCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("user_info="))
+        ?.split("=")[1];
+
+      if (userInfoCookie) {
+        try {
+          const decoded = JSON.parse(decodeURIComponent(userInfoCookie));
+          setUser({
+            name: decoded.name || decoded.email?.split("@")[0] || "Admin",
+            email: decoded.email || "admin@policypilot.com",
+          });
+        } catch (error) {
+          console.error("Error parsing user info:", error);
+          setUser({
+            name: "Admin",
+            email: "admin@policypilot.com",
+          });
+        }
+      }
+    };
+
+    getUserInfo();
+  }, []);
 
   return (
     <>
@@ -110,21 +142,43 @@ export function Navigation() {
                   variant="ghost"
                   className="w-full justify-start gap-3 h-auto p-3 hover:bg-muted/50 rounded-xl transition-all">
                   <Avatar className="h-9 w-9 ring-2 ring-primary/20">
-                    <AvatarImage src="https://psgpraveen.me/_next/image?url=%2Fimg%2Fpraveen.jpg&w=96&q=75" />
                     <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white font-semibold">
-                      PK
+                      {user?.name
+                        ?.split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2) || "AD"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-semibold">Praveen Kumar</p>
-                    <p className="text-xs text-muted-foreground">
-                      psgpraveen0804@gmail.com
+                    <p className="text-sm font-semibold">
+                      {user?.name || "Loading..."}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user?.email || "Loading..."}
                     </p>
                   </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.name || "Admin User"}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email || "admin@policypilot.com"}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/about" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <form action={logout}>
                   <DropdownMenuItem asChild>

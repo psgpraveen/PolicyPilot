@@ -75,13 +75,21 @@ export async function login(
       return { error: data.error || 'Login failed.' };
     }
 
-    // Store token in cookie
+    // Store token and user info in cookies
     const cookieStore = await cookies();
     cookieStore.set("auth_token", data.token, { 
       httpOnly: true, 
       path: "/",
       maxAge: 60 * 60 * 24 , // 1 day
     });
+    
+    // Store user info (accessible from client)
+    cookieStore.set("user_info", JSON.stringify(data.user), {
+      httpOnly: false,
+      path: "/",
+      maxAge: 60 * 60 * 24, // 1 day
+    });
+    
     revalidatePath("/", "layout");
     redirect("/policies");
   } catch (error) {
@@ -91,8 +99,9 @@ export async function login(
 
 export async function logout() {
   const cookieStore = await cookies();
-  cookieStore.delete("auth_token");
-  redirect("/login");
+  cookieStore.delete('auth_token');
+  cookieStore.delete('user_info'); // Also delete user info cookie
+  redirect('/login');
 }
 
 
