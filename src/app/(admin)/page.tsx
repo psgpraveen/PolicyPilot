@@ -207,12 +207,12 @@ export default function AdminDashboardPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
 
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0 flex-1">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {stat.title}
                   </p>
-                  <div className="flex items-baseline gap-2">
-                    <h3 className="text-3xl font-bold tracking-tight">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">
                       {stat.value}
                     </h3>
                     {stat.trend !== "neutral" && (
@@ -229,8 +229,8 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div
-                  className={`${stat.bgColor} p-3 rounded-xl shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                  <Icon className={`h-5 w-5 ${stat.color}`} />
+                  className={`${stat.bgColor} p-2.5 sm:p-3 rounded-xl shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 flex-shrink-0`}>
+                  <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${stat.color}`} />
                 </div>
               </CardHeader>
               <CardContent className="relative z-10 pb-4">

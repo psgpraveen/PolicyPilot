@@ -70,19 +70,19 @@ export default function SignUpPage() {
   });
 
   return (
-    <Card className="w-full shadow-2xl border-0 backdrop-blur-sm bg-white/95 overflow-hidden">
+    <Card className="w-full max-w-md shadow-2xl border-0 backdrop-blur-sm bg-white/95 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-primary/5 pointer-events-none" />
-      <CardHeader className="text-center space-y-3 relative">
+      <CardHeader className="text-center space-y-3 relative px-4 sm:px-6 pt-6 sm:pt-8">
         <div className="mx-auto mb-2 relative">
           <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full animate-pulse" />
-          <div className="relative bg-gradient-to-br from-purple-600 to-primary p-4 rounded-2xl shadow-lg">
-            <ShieldCheck className="h-10 w-10 text-white" />
+          <div className="relative bg-gradient-to-br from-purple-600 to-primary p-3 sm:p-4 rounded-2xl shadow-lg">
+            <ShieldCheck className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
           </div>
         </div>
-        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-primary bg-clip-text text-transparent">
+        <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-primary bg-clip-text text-transparent">
           Create an Account
         </CardTitle>
-        <CardDescription className="text-base">
+        <CardDescription className="text-sm sm:text-base">
           Join PolicyPilot to manage your clients and policies
         </CardDescription>
       </CardHeader>
