@@ -30,7 +30,10 @@ exports.getAllPolicies = async (req, res) => {
         issueDate: policy.issueDate,
         expiryDate: policy.expiryDate,
         amount: policy.amount,
-        attachment: policy.attachment,
+        attachmentUrl: policy.attachment
+          ? `/api/policies/${policy._id.toString()}/attachment`
+          : null,
+        hasAttachment: !!policy.attachment,
       })),
     });
   } catch (error) {
@@ -64,13 +67,13 @@ exports.createPolicy = async (req, res) => {
       });
     }
 
-    // Handle file upload - store as base64 in MongoDB for Vercel compatibility
-    let attachmentData = null;
+    // Handle file upload - store in MongoDB
+    let fileData = null;
     if (req.file) {
-      attachmentData = {
-        filename: req.file.originalname,
-        contentType: req.file.mimetype,
+      fileData = {
         data: req.file.buffer.toString("base64"),
+        contentType: req.file.mimetype,
+        filename: req.file.originalname,
         size: req.file.size,
       };
     }
@@ -83,7 +86,7 @@ exports.createPolicy = async (req, res) => {
       issueDate: issueDateObj,
       expiryDate: expiryDateObj,
       amount: parseFloat(amount),
-      attachment: attachmentData,
+      attachment: fileData,
       userId: req.user.userId,
     });
 
@@ -91,6 +94,9 @@ exports.createPolicy = async (req, res) => {
       success: true,
       message: "Policy created successfully",
       policyId: policyId.toString(),
+      fileUrl: fileData
+        ? `/api/policies/${policyId.toString()}/attachment`
+        : null,
     });
   } catch (error) {
     console.error("Create policy error:", error);
@@ -136,13 +142,13 @@ exports.updatePolicy = async (req, res) => {
       });
     }
 
-    // Handle file upload
-    let attachment = existingPolicy.attachment;
+    // Handle file upload - store in MongoDB
+    let fileData = existingPolicy.attachment;
     if (req.file) {
-      attachment = {
-        filename: req.file.originalname,
-        contentType: req.file.mimetype,
+      fileData = {
         data: req.file.buffer.toString("base64"),
+        contentType: req.file.mimetype,
+        filename: req.file.originalname,
         size: req.file.size,
       };
     }
@@ -155,7 +161,7 @@ exports.updatePolicy = async (req, res) => {
       issueDate: issueDateObj,
       expiryDate: expiryDateObj,
       amount: parseFloat(amount),
-      attachment,
+      attachment: fileData,
     });
 
     if (!updated) {
@@ -205,12 +211,12 @@ exports.deletePolicy = async (req, res) => {
   }
 };
 
-// Get attachment
-exports.getAttachment = async (req, res) => {
+// Get policy attachment
+exports.getPolicyAttachment = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find policy
+    // Get policy
     const policy = await policyModel.findById(id);
     if (!policy) {
       return res.status(404).json({ error: "Policy not found" });
@@ -227,18 +233,18 @@ exports.getAttachment = async (req, res) => {
     }
 
     // Convert base64 to buffer
-    const buffer = Buffer.from(policy.attachment.data, "base64");
+    const fileBuffer = Buffer.from(policy.attachment.data, "base64");
 
-    // Set headers
+    // Set appropriate headers
     res.setHeader("Content-Type", policy.attachment.contentType);
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${policy.attachment.filename}"`
+      `inline; filename="${policy.attachment.filename}"`
     );
-    res.setHeader("Content-Length", buffer.length);
+    res.setHeader("Content-Length", fileBuffer.length);
 
     // Send file
-    res.send(buffer);
+    res.send(fileBuffer);
   } catch (error) {
     console.error("Get attachment error:", error);
     res.status(500).json({ error: "Internal server error" });

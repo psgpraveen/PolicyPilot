@@ -135,7 +135,10 @@ GET    /api/policies             # Get all policies
 POST   /api/policies             # Create policy (multipart/form-data)
 PUT    /api/policies/:id         # Update policy (multipart/form-data)
 DELETE /api/policies/:id         # Delete policy
+GET    /api/policies/:id/attachment  # Download policy attachment
 ```
+
+**Note**: File attachments are stored directly in MongoDB as base64 encoded data.
 
 ---
 
@@ -160,8 +163,7 @@ DELETE /api/policies/:id         # Delete policy
 | Technology | Purpose |
 |------------|---------|
 | Express.js | Web framework |
-| MongoDB | Database |
-| Mongoose | (Not used - using native driver) |
+| MongoDB | Database (includes file storage) |
 | bcryptjs | Password hashing |
 | jsonwebtoken | JWT authentication |
 | Multer | File upload handling |
@@ -348,9 +350,11 @@ net start MongoDB
 - Verify `NEXT_PUBLIC_API_URL` in frontend .env.local
 
 ### File upload errors
-- Ensure `backend/uploads` directory exists
+- Files are stored directly in MongoDB as base64 encoded data
 - Check file size (max 5MB)
 - Check file type (PDF, JPG, PNG only)
+- Ensure MongoDB connection is working
+- For large files, consider increasing MongoDB document size limit
 
 ---
 

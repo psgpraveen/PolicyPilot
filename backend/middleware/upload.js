@@ -1,8 +1,7 @@
 const multer = require("multer");
-const path = require("path");
 
-// Use memory storage for Vercel (serverless) compatibility
-// Files will be stored in MongoDB as base64
+// Use memory storage to store files in buffer
+// Files will be stored directly in MongoDB as base64
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
