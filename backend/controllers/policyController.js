@@ -30,7 +30,7 @@ exports.getAllPolicies = async (req, res) => {
         issueDate: policy.issueDate,
         expiryDate: policy.expiryDate,
         amount: policy.amount,
-        attachmentUrl: policy.attachmentUrl,
+        attachment: policy.attachment,
       })),
     });
   } catch (error) {
@@ -64,10 +64,15 @@ exports.createPolicy = async (req, res) => {
       });
     }
 
-    // Handle file upload
-    let attachmentUrl;
+    // Handle file upload - store as base64 in MongoDB for Vercel compatibility
+    let attachmentData = null;
     if (req.file) {
-      attachmentUrl = `/uploads/${req.file.filename}`;
+      attachmentData = {
+        filename: req.file.originalname,
+        contentType: req.file.mimetype,
+        data: req.file.buffer.toString("base64"),
+        size: req.file.size,
+      };
     }
 
     // Create policy
@@ -78,7 +83,7 @@ exports.createPolicy = async (req, res) => {
       issueDate: issueDateObj,
       expiryDate: expiryDateObj,
       amount: parseFloat(amount),
-      attachmentUrl,
+      attachment: attachmentData,
       userId: req.user.userId,
     });
 
@@ -132,9 +137,14 @@ exports.updatePolicy = async (req, res) => {
     }
 
     // Handle file upload
-    let attachmentUrl = existingPolicy.attachmentUrl;
+    let attachment = existingPolicy.attachment;
     if (req.file) {
-      attachmentUrl = `/uploads/${req.file.filename}`;
+      attachment = {
+        filename: req.file.originalname,
+        contentType: req.file.mimetype,
+        data: req.file.buffer.toString("base64"),
+        size: req.file.size,
+      };
     }
 
     // Update policy
@@ -145,7 +155,7 @@ exports.updatePolicy = async (req, res) => {
       issueDate: issueDateObj,
       expiryDate: expiryDateObj,
       amount: parseFloat(amount),
-      attachmentUrl,
+      attachment,
     });
 
     if (!updated) {
@@ -191,6 +201,46 @@ exports.deletePolicy = async (req, res) => {
     });
   } catch (error) {
     console.error("Delete policy error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Get attachment
+exports.getAttachment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find policy
+    const policy = await policyModel.findById(id);
+    if (!policy) {
+      return res.status(404).json({ error: "Policy not found" });
+    }
+
+    // Check ownership
+    if (policy.userId !== req.user.userId) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    // Check if attachment exists
+    if (!policy.attachment || !policy.attachment.data) {
+      return res.status(404).json({ error: "No attachment found" });
+    }
+
+    // Convert base64 to buffer
+    const buffer = Buffer.from(policy.attachment.data, "base64");
+
+    // Set headers
+    res.setHeader("Content-Type", policy.attachment.contentType);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${policy.attachment.filename}"`
+    );
+    res.setHeader("Content-Length", buffer.length);
+
+    // Send file
+    res.send(buffer);
+  } catch (error) {
+    console.error("Get attachment error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

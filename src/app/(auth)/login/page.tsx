@@ -68,6 +68,7 @@ export default function LoginPage() {
           60 * 60 * 24
         }`;
       }
+      console.log("User info:", data.user);
 
       router.push("/");
     } catch (err) {

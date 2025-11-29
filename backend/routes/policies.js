@@ -8,6 +8,8 @@ router.use(authMiddleware);
 
 router.get("/", policyController.getAllPolicies);
 
+router.get("/:id/attachment", policyController.getAttachment);
+
 router.post(
   "/",
   upload.single("attachment"),
