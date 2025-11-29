@@ -308,7 +308,8 @@ curl -X POST http://localhost:5000/api/policies \
 - All fields required
 - Issue date < Expiry date
 - Amount > 0
-- File: PDF/JPG/PNG only, max 5MB
+- File: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, max 5MB
+- Files stored as base64 in MongoDB
 
 ---
 
@@ -352,7 +353,7 @@ net start MongoDB
 ### File upload errors
 - Files are stored directly in MongoDB as base64 encoded data
 - Check file size (max 5MB)
-- Check file type (PDF, JPG, PNG only)
+- Check file type (PDF, DOC, DOCX, XLS, XLSX, JPG, PNG)
 - Ensure MongoDB connection is working
 - For large files, consider increasing MongoDB document size limit
 

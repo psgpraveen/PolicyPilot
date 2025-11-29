@@ -22,7 +22,18 @@ export const CategorySchema = z.object({
 });
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+const ACCEPTED_FILE_TYPES = [
+  // Images
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  // Documents
+  'application/pdf',
+  'application/msword', // .doc
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+  'application/vnd.ms-excel', // .xls
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+];
 
 export const PolicySchema = z.object({
   id: z.string().optional(),
@@ -36,8 +47,8 @@ export const PolicySchema = z.object({
     .any()
     .refine((file) => !file || file.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
     .refine(
-      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type),
-      'Only .jpg, .png and .pdf formats are supported.'
+      (file) => !file || ACCEPTED_FILE_TYPES.includes(file.type),
+      'Supported formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.'
     ).optional(),
 }).refine((data) => data.expiryDate > data.issueDate, {
   message: 'Expiry date must be after the issue date.',
